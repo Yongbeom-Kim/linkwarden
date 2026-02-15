@@ -10,5 +10,5 @@ ssh_root: ## SSH into server as root user
 	set -a && . ./.env && set +a && ssh "root@$${PUBLIC_IPV4}"
 
 ssh_app: ## SSH into server as app user
-	set -a && . ./.env && set +a && ssh "app@$${PUBLIC_IPV4}"
+	set -a && . ./.env && set +a && ssh -tt "app@$${PUBLIC_IPV4}" 'cd ~/actions-runner/_work/linkwarden/linkwarden && exec bash -il'
 	# set -a && . ./.env && set +a && ssh "app@$${PUBLIC_IPV4}"
