@@ -23,7 +23,7 @@ jobs:
           echo NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL}} >> .env
           echo PAGE_ORIGIN=${{ secrets.PAGE_ORIGIN}} >> .env
           echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD}} >> .env
-
+          echo NEXT_PUBLIC_DISABLE_REGISTRATION=true >> .env
           
       - name: Show redacted env
         run: |
