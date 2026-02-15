@@ -1,0 +1,37 @@
+name: 'Deploy'
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+  repository_dispatch:
+
+jobs:
+  deploy:
+    name: 'Deploy to Prod'
+    runs-on: 'prod'
+    steps:
+      - name: Prune docker volumes
+        run: |
+          docker system prune -af
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET}} >> .env
+          echo NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL}} >> .env
+          echo PAGE_ORIGIN=${{ secrets.PAGE_ORIGIN}} >> .env
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD}} >> .env
+
+          
+      - name: Show redacted env
+        run: |
+          sed -E 's/=.*/=***REDACTED***/' .env
+
+      - name: Deploy
+        run: docker compose up -d
+
+      - name: Cleanup
+        if: always()
+        run: shred -u .env || rm -f .env

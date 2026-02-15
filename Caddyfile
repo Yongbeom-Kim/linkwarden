@@ -1,0 +1,15 @@
+# Uses PAGE_ORIGIN from .env (e.g. https://links.yongbeom.net)
+{$PAGE_ORIGIN} {
+    encode zstd gzip
+
+    # Forward all traffic to Linkwarden app container
+    reverse_proxy linkwarden:3000
+
+    # Basic hardening headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}

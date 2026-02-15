@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file: .env
+    restart: always
+    volumes:
+      - ../.linkwarden/volumes/postgresql/data:/var/lib/postgresql/data
+  linkwarden:
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    restart: always
+    # build: . # uncomment to build from source
+    image: ghcr.io/linkwarden/linkwarden:latest # comment to build from source
+    ports:
+      - 3000:3000
+    volumes:
+      - ../.linkwarden/volumes/linkwarden/data:/data/data
+    depends_on:
+      - postgres
+      - meilisearch
+  meilisearch:
+    image: getmeili/meilisearch:v1.12.8
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ../.linkwarden/volumes/meili/data:/meili/data
+  caddy:
+    image: caddy:2
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ../.linkwarden/volumes/caddy/data:/data
+      - ../.linkwarden/volumes/caddy/config:/config
+    depends_on:
+      - linkwarden
